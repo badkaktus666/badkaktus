@@ -1,71 +1,127 @@
 #include <iostream>
-using namespace std;
 
-char square[10] = { 'o','1','2','3','4','5','6','7','8','9' };
+class TicTacToe
+{
+private:
+    char board[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char current_turn = 'X';
+    bool playing = true;
+    int state = 0;
+    int input;
 
-int checkwin();
-void board();
+public:
+    void print_board();
+    int play_move(int index, char move);
+    int check_win(char move);
+    void start();
+};
 
 int main()
 {
-    int player = 1, i, choice;
+    TicTacToe game;
+    game.start();
+    return 0;
+}
 
-    char mark;
-    do
+void TicTacToe::start()
+{
+    while (playing == true)
     {
-        board();
-        player = (player % 2) ? 1 : 2;
-
-        cout << "Player " << player << ", enter a number:  ";
-        cin >> choice;
-
-        mark = (player == 1) ? 'X' : 'O';
-
-        if (choice == 1 && square[1] == '1')
-
-            square[1] = mark;
-        else if (choice == 2 && square[2] == '2')
-
-            square[2] = mark;
-        else if (choice == 3 && square[3] == '3')
-
-            square[3] = mark;
-        else if (choice == 4 && square[4] == '4')
-
-            square[4] = mark;
-        else if (choice == 5 && square[5] == '5')
-
-            square[5] = mark;
-        else if (choice == 6 && square[6] == '6')
-
-            square[6] = mark;
-        else if (choice == 7 && square[7] == '7')
-
-            square[7] = mark;
-        else if (choice == 8 && square[8] == '8')
-
-            square[8] = mark;
-        else if (choice == 9 && square[9] == '9')
-
-            square[9] = mark;
-        else
+        print_board();
+        std::cout << "Play your move " << current_turn << std::endl;
+        std::cin >> input;
+        if (play_move(input, current_turn) == 0)
         {
-            cout << "Invalid move ";
-
-            player--;
-            cin.ignore();
-            cin.get();
+            std::cout << "Box already occupied" << std::endl;
+            continue;
+        };
+        state = check_win(current_turn);
+        if (state == 1)
+        {
+            print_board();
+            std::cout << current_turn << " wins the game!" << std::endl;
+            break;
         }
-        i = checkwin();
+        else if (state == 2)
+        {
+            std::cout << "Draw!" << std::endl;
+            break;
+        };
+        current_turn = (current_turn == 'X') ? 'O' : 'X';
+    };
+};
 
-        player++;
-    } while (i == -1);
-    board();
-    if (i == 1)
+void TicTacToe::print_board()
+{
+    for (int i = 0; i < 9; i++)
+    {
+        if (i == 1 || i == 2 || i == 4 || i == 5 || i == 7 || i == 8)
+        {
+            std::cout << " | ";
+        }
+        std::cout << board[i];
+        if (i == 2 || i == 5)
+        {
+            std::cout << std::endl;
+            std::cout << "---------" << std::endl;
+        }
+    }
+    std::cout << std::endl;
+};
 
-        cout << "==>\aPlayer " << --player << " win ";
+int TicTacToe::play_move(int index, char move)
+{
+    if (index >= 0 && index < 9)
+    {
+        if (board[index] == ' ')
+        {
+            board[index] = move;
+            return 1;
+        }
+    }
+    return 0;
+};
+
+/*
+   0 1 2
+   3 4 5
+   6 7 8
+*/
+int TicTacToe::check_win(char move)
+{
+    if (
+        // Horizontal checks
+        (board[0] == move && board[1] == move && board[2] == move) ||
+        (board[3] == move && board[4] == move && board[5] == move) ||
+        (board[6] == move && board[7] == move && board[8] == move) ||
+        // Vertical Checks
+        (board[0] == move && board[3] == move && board[6] == move) ||
+        (board[1] == move && board[4] == move && board[7] == move) ||
+        (board[2] == move && board[5] == move && board[8] == move) ||
+        // Diagonal Checks
+        (board[0] == move && board[4] == move && board[8] == move) ||
+        (board[2] == move && board[4] == move && board[6] == move))
+    {
+        return 1;
+    }
     else
-        cout << "==>\aGame draw";
+    {
+        bool draw = true;
+        for (int i = 0; i < 9; i++)
+        {
+            if (board[i] == ' ')
+            {
+                draw = false;
+                break;
+            }
+        }
+        if (draw == true)
+        {
+            return 2;
+        }
+    }
+    return 0;
+};
 
     cin.ignore();
     cin.get();
